@@ -194,7 +194,7 @@ if current_novel_title:
                     try:
                         client = genai.Client(api_key=api_key)
                         res = client.models.generate_content(
-                            model="gemini-3.8-flash", 
+                            model="gemini-1.5-flash", 
                             contents=f"วิเคราะห์ตัวละคร: '{char_idea}' เสนอ MBTI, นพลักษณ์ และปมฝังใจ เป็นภาษาไทย"
                         )
                         st.markdown("### 💡 ผลการวิเคราะห์จาก AI:")
@@ -233,7 +233,7 @@ if current_novel_title:
                     try:
                         client = genai.Client(api_key=api_key)
                         res = client.models.generate_content(
-                            model="gemini-3.8-flash", 
+                            model="gemini-1.5-flash", 
                             contents=prompt
                         )
                         novel_data["episodes"].append({"ep_title": ep_title, "plot": sc_plot, "content": res.text})

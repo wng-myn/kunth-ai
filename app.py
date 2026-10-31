@@ -136,8 +136,9 @@ if current_novel_title:
             "ผจญภัย/การเดินทาง (Adventure)", "เติบโตไปด้วยกัน (Coming of Age)", 
             "สืบสวนสอบสวน/ปริศนา", "กำลังภายใน/เทพเซียน", "ไซไฟ/เทคโนโลยีล้ำยุค (Sci-Fi)"
         ]
-        saved_th = novel_data.get("themes", ["โรแมนติกแฟนตาซี"])
-        valid_default = [t for t in saved_th if t in theme_list]
+        
+        saved_themes = novel_data.get("themes", ["โรแมนติกแฟนตาซี"])
+        valid_default = [t for t in saved_themes if t in theme_list]
         selected_themes = st.multiselect("เลือกธีมหลัก:", theme_list, default=valid_default)
         custom_theme = st.text_input("ธีมเพิ่มเติม/ฉากหลังเฉพาะ:", value=novel_data.get("custom_theme", ""))
         
@@ -185,16 +186,22 @@ if current_novel_title:
         st.subheader("🧩 ห้องวิเคราะห์ปม จิตวิทยา และพฤติกรรมตัวละคร")
         char_idea = st.text_area("เล่าพล็อตเรื่องราว หรือพฤติกรรมสั้นๆ ของตัวละคร:")
         if st.button("🔍 ให้ AI ช่วยวิเคราะห์ปม นิสัย และแรงจูงใจ"):
-            if not api_key: st.error("กรุณากรอก API Key")
-            elif not char_idea: st.error("กรุณากรอกข้อมูล")
+            if not api_key: 
+                st.error("กรุณากรอก Google Gemini API Key ที่แถบด้านซ้ายก่อนครับ")
+            elif not char_idea: 
+                st.error("กรุณากรอกข้อมูลตัวละครก่อน")
             else:
-                with st.spinner("กำลังวิเคราะห์..."):
-                    client = genai.Client(api_key=api_key)
-                    res = client.models.generate_content(
-                        model="gemini-2.5-flash", 
-                        contents=f"วิเคราะห์ตัวละคร: '{char_idea}' เสนอ MBTI, นพลักษณ์ และปมฝังใจ เป็นภาษาไทย"
-                    )
-                    st.markdown(res.text)
+                with st.spinner("Gemini กำลังวิเคราะห์..."):
+                    try:
+                        client = genai.Client(api_key=api_key)
+                        res = client.models.generate_content(
+                            model="gemini-1.5-flash", 
+                            contents=f"วิเคราะห์ตัวละคร: '{char_idea}' เสนอ MBTI, นพลักษณ์ และปมฝังใจ เป็นภาษาไทย"
+                        )
+                        st.markdown("### 💡 ผลการวิเคราะห์จาก AI:")
+                        st.markdown(res.text)
+                    except Exception as e:
+                        st.error(f"เกิดข้อผิดพลาดจาก API: {e}")
 
     with tab3:
         st.subheader("✍️ กำหนดพล็อตตอนปัจจุบัน & ให้ Gemini บรรยายฉาก")
@@ -205,8 +212,10 @@ if current_novel_title:
         sc_tone = st.selectbox("โทนอารมณ์", ["ดราม่าเข้มข้น", "ตื่นเต้นระทึกขวัญ", "โรแมนติกหวานซึ้ง", "ตลกขบขัน", "หักมุมลึกลับ", "อุ่นวาบในหัวใจ"])
 
         if st.button("🚀 สั่งให้ Gemini เขียนบรรยายฉากและบันทึกอัตโนมัติ"):
-            if not api_key: st.error("กรุณากรอก API Key")
-            elif not sc_plot or not sel_chars: st.error("กรุณากรอกข้อมูลให้ครบ")
+            if not api_key: 
+                st.error("กรุณากรอก Google Gemini API Key ที่แถบด้านซ้ายก่อนครับ")
+            elif not sc_plot or not sel_chars: 
+                st.error("กรุณากรอกพล็อตและเลือกตัวละครอย่างน้อย 1 คน")
             else:
                 with st.spinner("Gemini กำลังแต่งนิยาย..."):
                     c_det = [f"- {c['name']} ({c['role']}) | บุคลิก: {c['trait']}" for c in novel_data["characters"] if c["name"] in sel_chars]
@@ -222,15 +231,18 @@ if current_novel_title:
                     [พล็อต] {sc_plot} | [โทน] {sc_tone}
                     แต่ง 2-4 ย่อหน้า และตอนท้ายให้เสนอทางเลือก (Choices) 3 ทาง
                     """
-                    client = genai.Client(api_key=api_key)
-                    res = client.models.generate_content(
-                        model="gemini-2.5-flash", 
-                        contents=prompt
-                    )
-                    novel_data["episodes"].append({"ep_title": ep_title, "plot": sc_plot, "content": res.text})
-                    save_novel(current_novel_title, novel_data)
-                    st.success("บันทึกตอนเรียบร้อย!")
-                    st.markdown(res.text)
+                    try:
+                        client = genai.Client(api_key=api_key)
+                        res = client.models.generate_content(
+                            model="gemini-1.5-flash", 
+                            contents=prompt
+                        )
+                        novel_data["episodes"].append({"ep_title": ep_title, "plot": sc_plot, "content": res.text})
+                        save_novel(current_novel_title, novel_data)
+                        st.success("บันทึกตอนเรียบร้อย!")
+                        st.markdown(res.text)
+                    except Exception as e:
+                        st.error(f"เกิดข้อผิดพลาดจาก API: {e}")
 
     with tab4:
         st.subheader("📚 รายชื่อตอนทั้งหมด & ส่งออกไฟล์")

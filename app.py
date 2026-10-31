@@ -136,7 +136,9 @@ if current_novel_title:
             "ผจญภัย/การเดินทาง (Adventure)", "เติบโตไปด้วยกัน (Coming of Age)", 
             "สืบสวนสอบสวน/ปริศนา", "กำลังภายใน/เทพเซียน", "ไซไฟ/เทคโนโลยีล้ำยุค (Sci-Fi)"
         ]
-        selected_themes = st.multiselect("เลือกธีมหลัก:", theme_list, default=novel_data.get("themes", ["โรแมนติกแฟนตาซี"]))
+        saved_th = novel_data.get("themes", ["โรแมนติกแฟนตาซี"])
+        valid_default = [t for t in saved_th if t in theme_list]
+        selected_themes = st.multiselect("เลือกธีมหลัก:", theme_list, default=valid_default)
         custom_theme = st.text_input("ธีมเพิ่มเติม/ฉากหลังเฉพาะ:", value=novel_data.get("custom_theme", ""))
         
         style_preset = st.selectbox("เลือกสไตล์การเขียนสำเร็จรูป:", [

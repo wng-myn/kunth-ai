@@ -189,7 +189,11 @@ if current_novel_title:
             elif not char_idea: st.error("กรุณากรอกข้อมูล")
             else:
                 with st.spinner("กำลังวิเคราะห์..."):
-                    res = genai.Client(api_key=api_key).models.generate_content(model="gemini-2.5-flash", contents=f"วิเคราะห์ตัวละคร: '{char_idea}' เสนอ MBTI, นพลักษณ์ และปมฝังใจ เป็นภาษาไทย")
+                    client = genai.Client(api_key=api_key)
+                    res = client.models.generate_content(
+                        model="gemini-2.5-flash", 
+                        contents=f"วิเคราะห์ตัวละคร: '{char_idea}' เสนอ MBTI, นพลักษณ์ และปมฝังใจ เป็นภาษาไทย"
+                    )
                     st.markdown(res.text)
 
     with tab3:
@@ -218,7 +222,11 @@ if current_novel_title:
                     [พล็อต] {sc_plot} | [โทน] {sc_tone}
                     แต่ง 2-4 ย่อหน้า และตอนท้ายให้เสนอทางเลือก (Choices) 3 ทาง
                     """
-                    res = genai.Client(api_key=api_key).models.generate_content(model="gemini-2.5-flash", contents=prompt)
+                    client = genai.Client(api_key=api_key)
+                    res = client.models.generate_content(
+                        model="gemini-2.5-flash", 
+                        contents=prompt
+                    )
                     novel_data["episodes"].append({"ep_title": ep_title, "plot": sc_plot, "content": res.text})
                     save_novel(current_novel_title, novel_data)
                     st.success("บันทึกตอนเรียบร้อย!")
